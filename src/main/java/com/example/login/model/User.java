@@ -13,11 +13,11 @@ import javax.validation.constraints.NotEmpty;
 import org.springframework.data.annotation.Transient;
 
 @Entity
-@Table(name = "User")
+@Table(name = "User", schema = "demo_db")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private int id;
 
     @Column(name = "email", nullable = false, unique = true)
@@ -33,7 +33,7 @@ public class User {
     @NotEmpty(message = "Please provide your first name")
     private String firstName;
 
-    @Column(name = "last name")
+    @Column(name = "last_name")
     @NotEmpty(message = "Please provide your last name")
     private String lastName;
 
@@ -98,5 +98,4 @@ public class User {
     public void setEnabled(boolean value){
         this.enabled = value;
     }
-
 }

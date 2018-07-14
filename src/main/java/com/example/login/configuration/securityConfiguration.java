@@ -11,14 +11,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 public class securityConfiguration extends WebSecurityConfigurerAdapter {
 
-
     protected void configure(HttpSecurity httpSecurity) throws Exception{
         httpSecurity.authorizeRequests()
                 .antMatchers("/register").permitAll()
                 .antMatchers("/confirm").permitAll();
     }
-
-
-
-
 }

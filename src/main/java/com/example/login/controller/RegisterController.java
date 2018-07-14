@@ -79,19 +79,67 @@ public class RegisterController {
             registrationEmail.setSubject("Registration Email");
             registrationEmail.setText(("To confirm your e-mail address, please click the link below:\n"
                     + appUrl + "/confirm?token=" + user.getConfirmationToken()));
-            registrationEmail.setFrom("noreply@domain.com");
+            registrationEmail.setFrom("no-reply@gmail.com");
 
             emailService.sendEmail(registrationEmail);
 
             modelAndView.addObject("confirmationMessage", "A confirmation e-mail has been sent to " + user.getEmail());
             modelAndView.setViewName("register");
-
         }
 
         return modelAndView;
-
     }
 
+    //Process Confirmation Link
+    @RequestMapping(value = "/confirm", method = RequestMethod.GET )
+    public ModelAndView confirmRegistration(ModelAndView modelAndView, @RequestParam("token") String token){
+        User user = userService.findByConfirmationToken(token);
 
+        if(user == null){ //No Token Found in DB
+            modelAndView.addObject("invalidToken","Ooops! This is an Invalid confirmation link");
+        }else{ //Token Found
+            modelAndView.addObject("confrimationToken",user.getConfirmationToken());
+        }
 
+        modelAndView.setViewName("confirm");
+        return modelAndView;
+    }
+
+    //Process confirmation link
+    @RequestMapping(value = "/confirm", method = RequestMethod.POST)
+    public ModelAndView confirmRegistration(ModelAndView modelAndView, BindingResult bindingResult, @RequestParam Map<String, String> requestParams, RedirectAttributes redir ){
+        modelAndView.setViewName("confirm");
+
+        Zxcvbn passwordCheck = new Zxcvbn();
+
+        Strength strength = passwordCheck.measure(requestParams.get("password"));
+
+        if(strength.getScore() < 3){
+            bindingResult.reject("password");
+
+            redir.addFlashAttribute("errorMessage", "Your password is too weak. Choose a stronger one");
+
+            modelAndView.setViewName("redirect:confirm?token=" + requestParams.get("token"));
+
+            System.out.println(requestParams.get("token"));
+
+            return modelAndView;
+        }
+
+        //Find user associated with reset token
+        User user = userService.findByConfirmationToken(requestParams.get("token"));
+
+        //Set new Password:error
+        user.setPassword(bCryptPasswordEncoder.encode(requestParams.get("password")));
+
+        //Set User to enabled
+        user.setEnabled(true);
+
+        //Save User
+        userService.saveUser(user);
+
+        modelAndView.addObject("successMessage", "Your password has been reset");
+
+        return modelAndView;
+    }
 }

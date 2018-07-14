@@ -34,6 +34,9 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
 	compile('org.springframework.boot:spring-boot-starter-web')
 
+	compile('org.hibernate.hibernate:hibernate-core:4.1.4.Final')
+	compile('org.hibernate.hibernate:hibernate-core:5.2.3.Final')
+	compile('org.mariadb.jdbc:mariadb-java-client:1.5.7')
 	runtime('mysql:mysql-connector-java')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
